@@ -1,0 +1,68 @@
+#Desarrollador:
+
+kind:           Deployment
+apiVersion:     apps/v1
+
+metadata:
+    name:       deployment-mariadb
+    labels:
+        app:    mariadb
+
+spec: 
+    replicas:   1
+    
+    selector:
+        matchLabels:
+            app:        mariadb
+    
+    template:
+        metadata:
+            name:       pod-mariadb
+            labels:
+                app:    mariadb
+        
+        spec: 
+            containers:
+                -   name:   mi-contenedor
+                    image:  mariadb:latest
+                    ports:
+                        - containerPort: 3306
+                    env:
+                        -   name:   MARIADB_ROOT_PASSWORD
+                            valueFrom:  
+                                secretKeyRef:
+                                    name:   configuracion-mariadb
+                                    key:    Administrador_contrasena
+                                    
+                        -   name:   MARIADB_DATABASE
+                            valueFrom:  
+                                configMapKeyRef:
+                                    name:   configuracion-mariadb
+                                    key:    BaseDatos_nombre
+                                    
+                        -   name:   MARIADB_USER
+                            valueFrom:  
+                                configMapKeyRef:
+                                    name:   configuracion-mariadb
+                                    key:    Usuario_nombre
+                                    
+                        -   name:   MARIADB_PASSWORD
+                            valueFrom:  
+                                secretKeyRef:
+                                    name:   configuracion-mariadb
+                                    key:    Usuario_contrasena
+
+---
+kind:           Service
+apiVersion:     v1
+
+metadata:
+    name:       db
+
+spec: 
+    type:       ClusterIP
+    ports:  
+               -    port: 3306
+                    targetPort: 3306
+    selector:
+        app:    mariadb

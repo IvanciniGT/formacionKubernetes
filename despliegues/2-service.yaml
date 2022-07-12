@@ -1,0 +1,20 @@
+kind:           Service
+apiVersion:     v1
+                # LIBRERIA/VERSION
+                # Esta es la libreria que declara el objeto Namespace
+
+metadata:
+    name:       nginx-ivan  # fqdn que se dará de alta en coreDNS
+                            # A donde apuntará ese nombre???
+                            # IP de balanceo de carga
+
+spec: 
+    type:       LoadBalancer
+    ports:  
+               -    port: 8080  # Puerto que se abre en la IP de balanceo
+                            # en la IP del servicio
+                    targetPort: 80  # Puerto en el contenedor
+                    nodePort: 30888
+    selector:
+        app:    nginx   # Elegir en backend los pods que tengan esta etiqueta
+                        # del mismo namespace que el servicio

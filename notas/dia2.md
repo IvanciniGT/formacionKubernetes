@@ -108,3 +108,27 @@ Solicitud de un almacenamiento:
 - Espacio requerido
 - Velocidad
 - Redundancia
+
+# Namespace
+
+Espacio lógico donde los nombres no pueden repetirse.
+
+Pod ivan
+Puedo crear un segundo pod que se llame ivan??? A priori no... porque ya existe...
+Bueno... existirá en un Espacio de Nombres (Namespace) en otro namespace si podré crearlo si no existe.
+
+Sirven para agrupar conceptualmente trabajos (pods, deployments, configMaps)
+
+Kubernetes permite posteriormente aplciar reglas a los namespaces: 
+- Limitarle los recursos que pueden usarse del cluster por los objetos creados asociados a ese Namespace
+- Limitar el acceso (usuarios) a los objetos de un namespace concreto
+
+solemos crear namespaces por proyecto, por cliente, por tipo de entorno
+
+Al final del recorrido, tenemos un contenedor ejecutadnose en una maquina del cluster.
+Contenedor? Entorno aislado donde ejecutar procesos de un SO Linux
+
+Puedo ejecutar nuevos procesos dentro de ese entorno aislado?
+
+$ kubectl exec [-it] POD -c CONTENEDOR -n NAMESPACE -- COMANDO             # Permite lanzar nuevos procesos dentro de un contenedor
+                ^^ TERMINAL INTERACTIVA

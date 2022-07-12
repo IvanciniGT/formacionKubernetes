@@ -624,3 +624,9 @@ Esos procesos donde van a ejecutarse en mi entorno de producción?
 Cuantos Jobs vamos nosotros a crear en Kubernetes? NINGUNO !!!!
 Quien va a crear los Jobs? Kubernetes
 Qué crearé yo en Kubernetes? 
+
+
+
+
+
+ b

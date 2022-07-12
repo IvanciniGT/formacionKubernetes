@@ -1,0 +1,14 @@
+kind:           Pod
+apiVersion:     v1
+                # LIBRERIA/VERSION
+                # Esta es la libreria que declara el objeto Namespace
+
+metadata:
+    name:       pod-ivan
+    labels:
+        app:    nginx
+
+spec: 
+    containers:
+        -   name:   mi-contenedor
+            image:  nginx:latest
