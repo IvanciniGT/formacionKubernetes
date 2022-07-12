@@ -4,7 +4,7 @@ sudo sed -i 's/\/var/#\/var/' /etc/fstab    # Desactivación persistente
 
 # Tenemos un problemita adicional... AMAZON, muy amable nos ha instalado docker, containerd en el host
 sudo apt purge docker-ce containerd.io -y
-sudo apt autoremove
+sudo apt autoremove -y
 
 # Tener un gestor de contenedores compatible con kubernetes: CRIO / Containerd
 # Activar unos modulos del kernel
@@ -17,6 +17,8 @@ net.bridge.bridge-nf-call-iptables = 1
 net.ipv4.ip_forward = 1
 EOF
 sudo sysctl --system
+
+#############################
 # instalar crio
 export OS=xUbuntu_18.04
 export VERSION=1.22
