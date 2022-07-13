@@ -99,6 +99,22 @@ spec:
         # Deployment < Con cualquiera de los Many
         # StatefulSet < con cualquiera de los Once
         
-    
-    
+---
+kind:       PersistentVolume
+apiVersion: v1
 
+metadata:
+    name:   mi-volumen
+
+spec:
+    capacity:
+            storage:    20Gi
+    storageClassName:   rapidito-redundante
+    accessModes:
+        - ReadWriteOnce     
+        - ReadOnlyMany     
+        - ReadWriteMany
+    # Tipo de volumen    
+    hostPath:
+        path: /home/ubuntu/environment/datos/misDatosPersistentes
+        type: DirectoryOrCreate
