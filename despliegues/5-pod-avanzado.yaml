@@ -1,0 +1,45 @@
+kind:           Pod
+apiVersion:     v1
+
+metadata:
+    name:       pod-ivan
+    labels:
+        app:    nginx
+
+spec: 
+    containers:
+        -   name:   mi-contenedor
+            image:  nginx:latest
+            imagePullPolicy: IfNotPresent
+            # Lo que yo quiero
+            resources:
+                # Estos son los datos que se usan para la fase de Scheduling
+                requests: # Lo que quiero que se me garantice: CALIBRACION > MONITORIZACION REAL
+                    memory: 300Mi
+                    cpu:    1000m
+                limits:   # Es el máximo que kubernetes me dejaría utilizar
+                    memory: 300Mi   # Debería ser igual al request
+                #    cpu:    50000m  # Aquí da igual. Cuanto más mejor
+            volumeMounts:
+                -   name: vol-efimero-1
+                    mountPath:  /efimero1
+        -   name:   mi-contenedor-2
+            image:  nginx:latest
+            imagePullPolicy: IfNotPresent
+            volumeMounts:
+                -   name: vol-efimero-1
+                    mountPath:  /datosEfimeros1
+    volumes:
+        -   name:   vol-efimero-1
+            # TIPO de volumen
+            emptyDir: {}        # Volumen que crea una caroeta en el host que se compartirá con el contenedor(es)
+                                # Esa carpeta, como su nombre indica, cada vez que se genere el pod, estará vacia
+                                # Tengo control de donde está la carpeta vacia: NO... ni puedo ni quiero
+                                # Este tipo se usa para compartir datos entre contenedores
+                
+# Uso de los volumenes en Kubernetes?
+# - PersistentVolumes: Persistencia de datos
+# - Compartir información entre contenedores
+# - Inyectar ficheros de configuración
+
+# Los volumenes se definen a nivel del POD/Plantilla de POD, no del contenedor

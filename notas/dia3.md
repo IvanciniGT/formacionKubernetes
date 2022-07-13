@@ -64,3 +64,123 @@ Kubernetes, instala mariadb, 1 copia !!!!                                       
     Si no existe ya mariadb... se instala
     Y si existe ???? ERROR !!!!!
 Kubernetes, tiene que haber 1 copia de mariadb en el cluster en funcionamiento siempre !!!!   < Declarativo
+
+
+
+----
+Asignación de recursos a conteendores
+
+300Mi = Lo que antes eran 300Mb
+        = 1024x1024 bytes
+    Kibibytes
+    Mebibytes 
+    Gibibytes
+300Mb
+    Megabytes
+    
+1 Kilobyte = 1024 bytes... PUES NO !
+1 kilobyte = 1000 bytes
+1 Kibibytes = 1024 bytes
+
+cpu: 0.5
+cpu: 500m
+        milicores
+
+Eso es el equivalente a usar media cpu durante 1 segundo
+Eso es el equivalente a usar 25% de 2 cpus durante 1 segundo
+
+
+
+Sabe un desarrollador los recursos que necesita su app?
+Asi debería ser... Cómo lo calculo?
+JMeter < Estimación basada en una simulación
+
+Esto solo depende del uso real de la aplicación
+Monitorización
+
+Importante es entender sobre todo en un kubernetes
+que esos datos en valor absoluto valen poco
+
+Escalado horizontal automatico-> Cluster
+Si la CPU Está al 30% escala
+Si la memoria está al 50% escala!
+
+Lo más importante de estos valores es la relación entre ellos
+
+El objetivo será calibrar una unidad de despliegue
+para atender una determinada cantidad de trabajo X la que sea.
+
+Calibrado de un pod:
+1º Fijo una carga de trabajo X, la que quiera (400 peticiones paralelamente)
+2º Calculo la memoria y CPU para esa carga de trabajo
+
+
+
+                    TOTAL                         NO COMPROMETIDOS                  USO
+                CPU         Memoria             CPU         Memoria             CPU         MEMORIA
+Maquina 1       4               8                0             1
+-Pod nginx      2               5                                               2             6    El nginx empezará a ir más lento
+-Filebeat       2               2                                               2             2
+
+Maquina 2       4               6                2             1        
+-Pod nginx      2               5                                               2             2
+
+
+A kubernetes el uso real de recursos se la trea al fresco
+Solo le interesa lo comprometido
+
+
+-Pod nginx      2               5       REQUESTS
+                4               7       LIMITS  
+
+-Filebeat       2               2       REQUEST
+
+
+
+MySQL > Infinita!
+
+A las BBDD cuando las arranco las configuro cuanta RAM pueden usar... 
+- Valor absoluto
+- Valor relativo a la disponible en el host
+
+Lo primero que quiere es subir la BBDD entera a RAM
+Después lo indices
+Despues los planes de ejecución
+Después los resultados de las queries
+Pa que está entonces el HDD???  Persistencia
+
+Uso de la RAM por parte de un programa:
+Datos de trabajo ... efimeros               <   De qué depende la cantidad de datos de trabajo? Carga de trabajo
+Cache            ... efimeros? No tanto     <   De qué depende la cantidad de datos de cache?   Tiempo
+
+Cuando se sacan las cosas de una cache?
+-   Cuando está llena ***********
+-   Cuando está obsoleta (tiempo)
+
+
+
+Si al final voy escalando... que me interesa en request memory cpu. 
+VALORES ALTOS O BAJOS?
+
+300Mi
+1000m       200 peticiones
+
+600Mi
+2000m       400 peticiones
+
+Memoria :                   300Mi
+ Datos de trabajo           100Mi
+ Cache                      200Mi
+ 
+Pod 1 \             De uso de memoria cuanto tengo: 600Mi
+Pod 2 /             Que va a pasar con sus caches? Cómo son sus caches? 
+                        Me temo que en cuanto pase un poquitin de tiempo, IGUALES
+                    Al final... cuanto espacio de RAM tengo disponible para trabajo?    200Mi
+                    Pero si tuviera solo un POD el doble de grande... la cache sería del mismo tamaño.
+                        Cuanto espacio de trabajo tendría aqui?     400 Mi
+                    
+                        
+Cliente(s)              > Balanceador > Tomcat1-webapp (Gestion de expedientes) Exp1         > MySQL
+                                        Tomcat2-webapp (Gestion de expedientes) Exp1         > MySQL
+cliente A- Exp1> tomcat2
+ 
