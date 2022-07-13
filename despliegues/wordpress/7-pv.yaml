@@ -1,0 +1,40 @@
+
+---
+kind:       PersistentVolume
+apiVersion: v1
+
+metadata:
+    name:   mi-volumen-1
+
+spec:
+    capacity:
+            storage:    20Gi
+    storageClassName:   rapidito-redundante
+    accessModes:
+        - ReadWriteOnce     
+        - ReadOnlyMany     
+        - ReadWriteMany
+    # Tipo de volumen    
+    hostPath:
+        path: /home/ubuntu/environment/datos/misDatosPersistentes1
+        type: DirectoryOrCreate
+
+---
+kind:       PersistentVolume
+apiVersion: v1
+
+metadata:
+    name:   mi-volumen-2
+
+spec:
+    capacity:
+            storage:    20Gi
+    storageClassName:   rapidito-redundante
+    accessModes:
+        - ReadWriteOnce     
+        - ReadOnlyMany     
+        - ReadWriteMany
+    # Tipo de volumen    
+    hostPath:
+        path: /home/ubuntu/environment/datos/misDatosPersistentes2
+        type: DirectoryOrCreate

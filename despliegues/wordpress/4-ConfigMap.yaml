@@ -1,0 +1,26 @@
+
+---# Infraestructura
+
+kind:       ConfigMap
+apiVersion: v1
+
+metadata:
+    name:   configuracion-mariadb
+
+data:
+    Usuario_nombre:             usuario
+    BaseDatos_nombre:           prueba
+
+---
+
+kind:       Secret
+apiVersion: v1
+
+metadata:
+    name:   configuracion-mariadb
+
+data:
+    Administrador_contrasena:   cGFzc3dvcmQ= # Base64
+    Usuario_contrasena:         cGFzc3dvcmQ=
+# Existe un comando en kubernetes para crear secretos directamente sin pasar por fichero
+# kubectl 

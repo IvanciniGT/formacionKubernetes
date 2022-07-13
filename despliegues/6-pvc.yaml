@@ -1,0 +1,22 @@
+---
+kind:       PersistentVolumeClaim
+apiVersion: v1
+
+metadata:
+    name:   mi-peticion
+
+spec:
+    resources:
+        requests:
+            storage:    10Gi
+    storageClassName:   rapidito-redundante
+    accessModes:
+        - ReadWriteOnce     # El volumen se podrá montar solo en un nodo, y podrá ser usado por los pods de ese nodo
+        #- ReadWriteMany     # El volumen se podrá montar en un varios nodo, y podrá ser usado por los pods de esos nodos
+        #- ReadOnlyMany      # El volumen se podrá montar en un varios nodo, y podrá ser usado por los pods de esos nodos.
+                            # Pero de solo lectura
+        #- ReadWriteOncePod  # El volumen se entregará solo a un POD... y quedará consumido
+        
+        # Deployment < Con cualquiera de los Many
+        # StatefulSet < con cualquiera de los Once
+        

@@ -1,0 +1,28 @@
+---
+kind:       PersistentVolumeClaim
+apiVersion: v1
+
+metadata:
+    name:   mi-peticion-mariadb
+
+spec:
+    resources:
+        requests:
+            storage:    10Gi
+    storageClassName:   rapidito-redundante
+    accessModes:
+        - ReadWriteOnce    
+---
+kind:       PersistentVolumeClaim
+apiVersion: v1
+
+metadata:
+    name:   mi-peticion-wordpress
+
+spec:
+    resources:
+        requests:
+            storage:    10Gi
+    storageClassName:   rapidito-redundante
+    accessModes:
+        - ReadWriteOnce   

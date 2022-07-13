@@ -4,46 +4,56 @@ kind:           Deployment
 apiVersion:     apps/v1
 
 metadata:
-    name:       deployment-wordpress
+    name:       deployment-mariadb
     labels:
-        app:    wordpress
+        app:    mariadb
 
 spec: 
     replicas:   1
     
     selector:
         matchLabels:
-            app:        wordpress
+            app:        mariadb
     
     template:
         metadata:
-            name:       pod-wordpress
+            name:       pod-mariadb
             labels:
-                app:    wordpress
+                app:    mariadb
         
         spec: 
+            volumes:
+                -   name:   persistencia
+                    persistentVolumeClaim:
+                        claimName: mi-peticion-mariadb
             containers:
                 -   name:   mi-contenedor
-                    image:  wordpress:latest
+                    image:  mariadb:latest
+                    volumeMounts:
+                        -   name:   persistencia
+                            mountPath: /var/lib/mysql
                     ports:
-                        - containerPort: 80
+                        - containerPort: 3306
                     env:
-                        -   name:   WORDPRESS_DB_HOST
-                            value:  db
+                        -   name:   MARIADB_ROOT_PASSWORD
+                            valueFrom:  
+                                secretKeyRef:
+                                    name:   configuracion-mariadb
+                                    key:    Administrador_contrasena
                                     
-                        -   name:   WORDPRESS_DB_NAME
+                        -   name:   MARIADB_DATABASE
                             valueFrom:  
                                 configMapKeyRef:
                                     name:   configuracion-mariadb
                                     key:    BaseDatos_nombre
                                     
-                        -   name:   WORDPRESS_DB_USER
+                        -   name:   MARIADB_USER
                             valueFrom:  
                                 configMapKeyRef:
                                     name:   configuracion-mariadb
                                     key:    Usuario_nombre
                                     
-                        -   name:   WORDPRESS_DB_PASSWORD
+                        -   name:   MARIADB_PASSWORD
                             valueFrom:  
                                 secretKeyRef:
                                     name:   configuracion-mariadb
@@ -54,13 +64,12 @@ kind:           Service
 apiVersion:     v1
 
 metadata:
-    name:       wp
+    name:       db
 
 spec: 
-    type:       NodePort
+    type:       ClusterIP
     ports:  
-               -    port: 80
-                    targetPort: 80
-                    nodePort: 30080
+               -    port: 3306
+                    targetPort: 3306
     selector:
-        app:    wordpress
+        app:    mariadb
