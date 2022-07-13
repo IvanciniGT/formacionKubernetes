@@ -184,3 +184,22 @@ Cliente(s)              > Balanceador > Tomcat1-webapp (Gestion de expedientes) 
                                         Tomcat2-webapp (Gestion de expedientes) Exp1         > MySQL
 cliente A- Exp1> tomcat2
  
+
+
+Contenedor1
+    Nginx
+        -> access.log... se puede llenar? dale tiempo... y verás
+        SOLUCIÓN
+            Rotado de logs
+            Cuantos quiero (archivos):
+            Con 2 me vale!
+            log1..... cuando se llena 50Kbs
+            log2..... cuando se llena 50Kbs
+    
+Contenedor2
+    Filebeat
+        access.log > ElasticSearch
+        
+    Podría hacer que esto... vaya como un tiro????
+    Cual es el cuello de botella... El HDD
+    Usar la memoria como si fuera HDD.

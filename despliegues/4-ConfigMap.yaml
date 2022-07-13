@@ -4,6 +4,28 @@ kind:       ConfigMap
 apiVersion: v1
 
 metadata:
+    name:   configuracion-nginx
+
+data:
+    nginx.conf: |
+        Soy el fichero de configuración del nginx
+        Que configuro muchas cosas
+        
+        Y aqui más cosas
+        como los virtual host
+        
+        Y unos proxy redirect
+        
+        Y más aun
+        
+        Y más
+        
+---# Infraestructura
+
+kind:       ConfigMap
+apiVersion: v1
+
+metadata:
     name:   configuracion-mariadb
 
 data:

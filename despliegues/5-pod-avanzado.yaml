@@ -25,21 +25,80 @@ spec:
                     mountPath:  /efimero1
         -   name:   mi-contenedor-2
             image:  quay.io/fedora/fedora:latest
+            command:    
+                - tail 
+                - -f 
+                - /dev/null
             imagePullPolicy: IfNotPresent
             volumeMounts:
                 -   name: vol-efimero-1
                     mountPath:  /datosEfimeros1
+                -   name: vol-configuracion
+                    mountPath:  /configuracion
+                -   name: vol-persistencia-inutil
+                    mountPath:  /inutil
+                -   name: vol-persistencia-util
+                    mountPath:  /util
     volumes:
         -   name:   vol-efimero-1
             # TIPO de volumen
-            emptyDir: {}        # Volumen que crea una caroeta en el host que se compartirá con el contenedor(es)
+            emptyDir: #{}        # Volumen que crea una caroeta en el host que se compartirá con el contenedor(es)
                                 # Esa carpeta, como su nombre indica, cada vez que se genere el pod, estará vacia
                                 # Tengo control de donde está la carpeta vacia: NO... ni puedo ni quiero
                                 # Este tipo se usa para compartir datos entre contenedores
+                    medium: Memory
+                        # Esto potencialmente podría llegar a usar TODA la memoria del POD
+                        # Como lo limito? En kubernetes NO
+                        # Por ejemplo, en el rotado de los logs (Ficheros de 50kbs)
                 
+        -   name:   vol-configuracion
+                    # Quiero un volumen para meter un fichero de configuración 
+            configMap: # secret
+                name: configuracion-nginx
+        ###### ^^^^TODO GUAY. Volumenes no persistentes
+        ###### vvvv Asi no se trabaja en la realidad. Volumenes persistentes
+        -   name:   vol-persistencia-inutil
+            hostPath:
+            # Solo para inyectar ficheros del FS host al contenedor:
+                # Montar un Docker In Docker
+                # Inyectar fichero de procesos del SO
+                path: /home/ubuntu/environment/datos/misDatos
+                type: DirectoryOrCreate
+                        #File
+                        #FileOrCreate
+                        #Directory
+        -   name:   vol-persistencia-util
+            persistentVolumeClaim:
+                claimName: mi-peticion
+
 # Uso de los volumenes en Kubernetes?
 # - PersistentVolumes: Persistencia de datos
-# - Compartir información entre contenedores
-# - Inyectar ficheros de configuración
+# - Compartir información entre contenedores - emptyDir
+# - Inyectar ficheros de configuración       - configMap / secret
 
 # Los volumenes se definen a nivel del POD/Plantilla de POD, no del contenedor
+---
+kind:       PersistentVolumeClaim
+apiVersion: v1
+
+metadata:
+    name:   mi-peticion
+
+spec:
+    resources:
+        requests:
+            storage:    10Gi
+    storageClassName:   rapidito-redundante
+    accessModes:
+        - ReadWriteOnce     # El volumen se podrá montar solo en un nodo, y podrá ser usado por los pods de ese nodo
+        #- ReadWriteMany     # El volumen se podrá montar en un varios nodo, y podrá ser usado por los pods de esos nodos
+        #- ReadOnlyMany      # El volumen se podrá montar en un varios nodo, y podrá ser usado por los pods de esos nodos.
+                            # Pero de solo lectura
+        #- ReadWriteOncePod  # El volumen se entregará solo a un POD... y quedará consumido
+        
+        # Deployment < Con cualquiera de los Many
+        # StatefulSet < con cualquiera de los Once
+        
+    
+    
+
