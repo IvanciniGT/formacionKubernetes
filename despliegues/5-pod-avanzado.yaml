@@ -24,7 +24,7 @@ spec:
                 -   name: vol-efimero-1
                     mountPath:  /efimero1
         -   name:   mi-contenedor-2
-            image:  nginx:latest
+            image:  quay.io/fedora/fedora:latest
             imagePullPolicy: IfNotPresent
             volumeMounts:
                 -   name: vol-efimero-1
