@@ -9,7 +9,7 @@ spec:
     resources:
         requests:
             storage:    1Gi
-    storageClassName:   rapidito-redundante
+    storageClassName:   redundante
     accessModes:
         - ReadWriteMany
 ---
@@ -42,7 +42,7 @@ kind:           ConfigMap
 apiVersion:     v1
 
 metadata:
-    name:       datos_aplicacion
+    name:       datos-aplicacion
 
 data:
     REPO_GIT:   https://github.com/IvanciniGT/webEjemploAnsible
@@ -97,7 +97,7 @@ spec:
             initContainers:
                 -   name:   clonador-app
                     image:  bitnami/git
-                    imagePullPolicy: IfNotExists
+                    imagePullPolicy: IfNotPresent
                     command:
                         - /tmp/clonar.sh
                     #env:
@@ -108,7 +108,7 @@ spec:
                     #                key: REPO_GIT
                     envFrom:
                         -   configMapRef:
-                                name:   datos_aplicacion
+                                name:   datos-aplicacion
                         # Inyecta todas las variables definidas en el configmap 
                         #   como variables de entorno
                         #   Esto es menos flexible, no puedo cambiar los nombres
@@ -121,7 +121,7 @@ spec:
             containers:
                 -   name:   mi-contenedor
                     image:  nginx:latest
-                    imagePullPolicy: IfNotExists
+                    imagePullPolicy: IfNotPresent
                     ports:
                         - containerPort: 80 
                     volumeMounts:
