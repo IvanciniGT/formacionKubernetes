@@ -1,0 +1,187 @@
+
+---
+kind:           ConfigMap
+apiVersion:     v1
+
+metadata:
+    name:       test-nginx
+
+data:
+    ready.sh: |
+        #!/bin/bash
+        
+        [ $(curl -s localhost | grep -c "fichero de la WEB") == 1 ] && echo Todo OK || exit 1
+
+---
+kind:       PersistentVolumeClaim
+apiVersion: v1
+
+metadata:
+    name:   pvc-app
+
+spec:
+    resources:
+        requests:
+            storage:    1Gi
+    storageClassName:   redundante
+    accessModes:
+        - ReadWriteMany
+---
+kind:           ConfigMap
+apiVersion:     v1
+
+metadata:
+    name:       fichero-configuracion-nginx
+
+data:
+    app.conf: |
+        server {
+            listen       80;
+            listen  [::]:80;
+            server_name  localhost;
+        
+            location / {
+                root   /app;
+                index  index.html index.htm;
+            }
+        
+            error_page   500 502 503 504  /50x.html;
+            location = /50x.html {
+                root   /app;
+            }
+        
+        }
+---
+kind:           ConfigMap
+apiVersion:     v1
+
+metadata:
+    name:       datos-aplicacion
+
+data:
+    REPO_GIT:   https://github.com/IvanciniGT/webEjemploAnsible
+---
+kind:           ConfigMap
+apiVersion:     v1
+
+metadata:
+    name:       clonador
+
+data:
+    clonar.sh: |
+        #!/bin/bash
+        
+        if [ ! -f /app/index.html ]; then 
+            # yum install git -y
+            git clone $REPO_GIT /app
+        fi
+---
+kind:           Deployment
+apiVersion:     apps/v1
+
+metadata:
+    name:       deployment-ivan
+    labels:
+        app:    nginx
+
+spec: 
+    replicas:   1
+    
+    selector:
+        matchLabels:
+            app:        nginx
+    
+    template:
+        metadata:
+            name:       pod-ivan
+            labels:
+                app:    nginx
+        
+        spec:
+            volumes:
+
+                -   name:       test-nginx
+                    configMap:
+                        name:   test-nginx
+                        defaultMode: 0777
+                -   name:       clonador
+                    configMap:
+                        name:   clonador
+                        defaultMode: 0777
+                -   name:       configuracion-nginx
+                    configMap:
+                        name:   fichero-configuracion-nginx
+                -   name:       aplicacion
+                    persistentVolumeClaim:
+                        claimName:  pvc-app
+            initContainers:
+                -   name:   clonador-app
+                    image:  bitnami/git #quay.io/fedora/fedora:latest #
+                    imagePullPolicy: IfNotPresent
+                    command:
+                        - /tmp/clonar.sh
+                    #env:
+                    #    -   name:   REPO_GIT
+                    #        valueFrom:
+                    #            configMapKeyRef:
+                    #                name:   datos_aplicacion
+                    #                key: REPO_GIT
+                    envFrom:
+                        -   configMapRef:
+                                name:   datos-aplicacion
+                        # Inyecta todas las variables definidas en el configmap 
+                        #   como variables de entorno
+                        #   Esto es menos flexible, no puedo cambiar los nombres
+                        # de las variables
+                    volumeMounts:
+                        -   name:   aplicacion
+                            mountPath:  /app
+                        -   name:   clonador
+                            mountPath:  /tmp
+            containers:
+                -   name:   mi-contenedor
+                    image:  nginx:latest
+                    imagePullPolicy: IfNotPresent
+                    ports:
+                        - containerPort: 80 
+                    volumeMounts:
+                        -   name:   test-nginx
+                            mountPath:  /tmp/tests
+                        -   name:   configuracion-nginx
+                            mountPath:  /etc/nginx/conf.d
+                        -   name:   aplicacion
+                            mountPath:  /app
+                    livenessProbe:
+                        httpGet:
+                            path: /
+                            port: 80
+                        initialDelaySeconds:    3
+                        periodSeconds:          2
+                        timeoutSeconds:         2
+                        successThreshold:       1
+                        failureThreshold:       3
+                    readinessProbe:
+                        exec:
+                            command: 
+                                - /tmp/tests/ready.sh
+                        initialDelaySeconds:    3
+                        periodSeconds:          2
+                        timeoutSeconds:         2
+                        successThreshold:       1
+                        failureThreshold:       3
+                        
+---
+kind:           Service
+apiVersion:     v1
+
+metadata:
+    name:       nginx-ivan 
+
+spec: 
+    type:       LoadBalancer
+    ports:  
+               -    port: 8080 
+                    targetPort: 80
+                    nodePort: 30888
+    selector:
+        app:    nginx  

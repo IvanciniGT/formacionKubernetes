@@ -110,3 +110,42 @@ mysql
         Detener el contestar peticiones. No está ready
         
     Esta live.. SI... haciendo su backup... ya acabará y volverá a estar listo para atender a los clientes
+    
+    
+Elastic de juguete
+Elastic es una herramienta distribuida
+Que se puede separar en nodos distintos componentes (funcionalmente diferentes)
+Un elastic se monta en cluster: 3 nodos... que pueden hacer de todo (maestros, datos)
+
+
+Nginx replica 1 nodo1
+      replica 2 nodo2
+      Esto es un sistema distribuido?   NO ... Tengo un cluster con redundancia
+
+
+Elastic
+
+nodo1   -> nodo2, nodo3.       nodo2 <> nodo3      
+nodo2   -> nodo3, nodo1
+nodo3   -> nodo1, nodo2
+
+3 Pods????? en kubernetes? Noooop
+
+Cuantos templates de pods montamos? 1 -> 3 replicas
+
+Como los comunicaciones entre si? 
+
+Cada replica de la plantilla de pod, que será un po, tendrá su propia IP.
+Pondré la IP? NO... porque no se ni cual es
+Pondre un fqdn.... De donde lo saco? Balanceador / Service
+
+¿Cuantos service necesito? 1 para cada pod. > statefulSet
+
+elasticsearch -> es1
+                 es2
+                 es3.  ???? Uno de los pos contestará
+                 
+                 
+statefulSet
+    - Que cada replica pueda tener su propio volumen, basado en una pvc propia, que se generará autom, desde una plantilla
+    - Que cada replica tenga su propio servicio que la identifique en red.
