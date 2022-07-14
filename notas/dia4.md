@@ -71,3 +71,42 @@ Vamos a crear un volumen < app
     
     datos_aplicacion
     clonador
+    
+
+ Cómo sabe Kubernetes si un Pod está en marcha:
+    Si los procesos 1 de sus contenedores están corriendo
+    
+Probes:
+- startUpProbe
+    Prueba de que el comando inicial está arrancando satisfactoriamente
+    Si falla??? Se tumba el pod y se recrea
+    Si va bien? Pasamos a las pruebas de liveness
+- livessProbe
+    Prueba de que el proceso está corriendo y funcionando sin problemas
+    Si falla?   Se reinicia el pod
+    Si va bien? A la readiness Probe
+    Esta prueba tiene una determinada peridodicidad
+- readinessProbe
+    Pruebas de que el proceso está listo para ofrecer servicio
+    Si falla?   Se va a la livenessProbe
+                Se quita el pod del balanceador (servicio)
+    Si todo va bien?    
+                Se da de alta el pod en el balanceador (servicio)
+    Esta prueba tiene una determinada peridodicidad.
+        Intentos: 3 -> NotReady
+
+Nginx
+Kubernetes solo miraba si el proceso de nginx está funcionando. Es suficiente?
+
+curl localhost:80 -> RESPUESTA 200 --- Contenga "Soy el fichero de la web"
+SmokeTest
+
+nginx
+    Ready -> curl va bien
+    Live  -> si el proceso está en marcha... y nginx responde con algo
+
+mysql
+    backup en frio ----> ready? 
+        Detener el contestar peticiones. No está ready
+        
+    Esta live.. SI... haciendo su backup... ya acabará y volverá a estar listo para atender a los clientes

@@ -1,3 +1,17 @@
+
+---
+kind:           ConfigMap
+apiVersion:     v1
+
+metadata:
+    name:       test-nginx
+
+data:
+    ready.sh: |
+        #!/bin/bash
+        
+        [ $(curl -s localhost | grep -c "fichero de la WEB") == 1 ] && echo Todo OK || exit 1
+
 ---
 kind:       PersistentVolumeClaim
 apiVersion: v1
@@ -58,6 +72,7 @@ data:
         #!/bin/bash
         
         if [ ! -f /app/index.html ]; then 
+            # yum install git -y
             git clone $REPO_GIT /app
         fi
 ---
@@ -84,6 +99,11 @@ spec:
         
         spec:
             volumes:
+
+                -   name:       test-nginx
+                    configMap:
+                        name:   test-nginx
+                        defaultMode: 0777
                 -   name:       clonador
                     configMap:
                         name:   clonador
@@ -96,7 +116,7 @@ spec:
                         claimName:  pvc-app
             initContainers:
                 -   name:   clonador-app
-                    image:  bitnami/git
+                    image:  bitnami/git #quay.io/fedora/fedora:latest #
                     imagePullPolicy: IfNotPresent
                     command:
                         - /tmp/clonar.sh
@@ -125,10 +145,31 @@ spec:
                     ports:
                         - containerPort: 80 
                     volumeMounts:
+                        -   name:   test-nginx
+                            mountPath:  /tmp/tests
                         -   name:   configuracion-nginx
                             mountPath:  /etc/nginx/conf.d
                         -   name:   aplicacion
                             mountPath:  /app
+                    livenessProbe:
+                        httpGet:
+                            path: /
+                            port: 80
+                        initialDelaySeconds:    3
+                        periodSeconds:          2
+                        timeoutSeconds:         2
+                        successThreshold:       1
+                        failureThreshold:       3
+                    readinessProbe:
+                        exec:
+                            command: 
+                                - /tmp/tests/ready.sh
+                        initialDelaySeconds:    3
+                        periodSeconds:          2
+                        timeoutSeconds:         2
+                        successThreshold:       1
+                        failureThreshold:       3
+                        
 ---
 kind:           Service
 apiVersion:     v1

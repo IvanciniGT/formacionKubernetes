@@ -628,5 +628,3 @@ Qué crearé yo en Kubernetes?
 
 
 
-
- b
