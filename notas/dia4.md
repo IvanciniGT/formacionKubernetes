@@ -56,4 +56,18 @@ elasticsearch
 
 ---
 
-Queremos un deployment con nginx
+Queremos un deployment con nginx        √
+Pod x 1
+    initContainers
+        clone repo
+    Contenedor NGINX                    √
+    
+Vamos a inyectar el ficheros de configuración de nginx a través de un volumen:
+/usr/share/nginx/html ---> /app         √
+
+Vamos a crear un volumen < app
+    -> Contenedor nginx /app
+    
+    
+    datos_aplicacion
+    clonador
