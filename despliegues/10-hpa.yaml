@@ -1,0 +1,22 @@
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+
+metadata:
+  name: hpa-deployment-ivan
+
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: deployment-ivan
+    
+  minReplicas: 1
+  maxReplicas: 10
+  
+  metrics:
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 40      # Es una medida relativa.... Como se calcula?       Memoria EN USO ACTUAL   / TOTAL MEMORIA x 100

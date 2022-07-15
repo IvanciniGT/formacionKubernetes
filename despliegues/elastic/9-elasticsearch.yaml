@@ -72,6 +72,66 @@ spec:
                 app:    elasticsearch
         
         spec:
+            
+            # Esto es una RUINA !!!!!!! NO USAR JAMAS EN LA VIDA
+            # nodeName: ip-172-31-14-209  # Aqui pongo el nombre de un nodo
+            
+            #nodeSelector: # No es muy flexible, pero, ES MUY COMODO, y cuando es todo lo que necesito, esta GUAY !
+                # etiquetas
+                #beta.kubernetes.io/arch: amd64
+                #kubernetes.io/hostname: ip-172-31-14-209
+            #    elasticsearch: ""
+            
+            affinity:   # Esta es la superguay.... Pero agarraos a la silla !
+                nodeAffinity:
+                    requiredDuringSchedulingIgnoredDuringExecution:     
+                        nodeSelectorTerms:
+                            -   matchExpressions:
+                                -   key:        elasticsearch
+                                    operator:   "Exists" # NotIn Exists DoesNotExists Gt Lt
+                                    #values:
+                                #-   key:        beta.kubernetes.io/arch
+                                #    operator:   "In" # NotIn Exists DoesNotExists Gt Lt
+                                #    values:
+                                #        - amd64
+                                #         - arm
+                    #preferredDuringSchedulingIgnoredDuringExecution:            
+                    #    -   weight: 10  # Aqui pongo un numero,... lo que quiera... Las reglas que se cumplan, suman puntos. En no con mas puntos tiene preferencia
+                    #        preference:
+                    #            matchExpressions:
+                    #                -   key:        elasticsearch
+                    #                    operator:   "Exists" # NotIn Exists DoesNotExists Gt Lt
+                    #    -   weight: 5  # Aqui pongo un numero,... lo que quiera... Las reglas que se cumplan, suman puntos. En no con mas puntos tiene preferencia
+                    #        preference:
+                    #            matchExpressions:
+                    #                -   key:        es
+                    #                    operator:   "Exists" # NotIn Exists DoesNotExists Gt Lt
+
+
+                #podAffinity:
+                   
+                podAntiAffinity:
+                    #requiredDuringSchedulingIgnoredDuringExecution:     
+                    preferredDuringSchedulingIgnoredDuringExecution:          # Intenta  
+                        -   weight: 10  # Aqui pongo un numero,... lo que quiera... Las reglas que se cumplan, suman puntos. En no con mas puntos tiene preferencia
+                            podAntiAffinityTerm:
+                                labelSelector:
+                                    matchExpressions:
+                                        -   key:        app
+                                            operator:   In # NotIn Exists DoesNotExists Gt Lt
+                                            values:
+                                                - elasticseach
+                                topologyKey: kubernetes.io/hostname         # Con quien genero mal rollo
+            toleration:
+                #-   key:        elasticsearch
+                #    operator:   Equal
+                #    value:      "true"
+                #    effect:     NoSchedule
+                    
+                -   key:        elasticsearch
+                    operator:   Exists
+                    effect:     NoSchedule
+            
             volumes:
 
                 -   name:       test-elasticsearch
